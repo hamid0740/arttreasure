@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">ArtTreasure</string>
+    <string name="title_activity_main">ArtTreasure</string>
+    <string name="package_name">ir.mamaz.arttreasure</string>
+    <string name="custom_url_scheme">ir.mamaz.arttreasure</string>
+</resources>
