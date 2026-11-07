@@ -7,6 +7,9 @@ on:
       - master
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -44,8 +47,22 @@ jobs:
           cd android
           ./gradlew assembleDebug --stacktrace
 
-      - name: Upload APK Artifact
-        uses: actions/upload-artifact@v4
+      - name: Extract App Version
+        id: get_version
+        run: |
+          VERSION=$(grep 'versionName' android/app/build.gradle | head -n 1 | awk -F '"' '{print $2}')
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Prepare Versioned APK
+        run: cp android/app/build/outputs/apk/debug/app-debug.apk "ArtTreasure-v${{ env.APP_VERSION }}.apk"
+
+      - name: Publish to GitHub Releases
+        uses: softprops/action-gh-release@v2
         with:
-          name: ArtTreasure-Debug-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          tag_name: "v${{ env.APP_VERSION }}"
+          name: "ArtTreasure v${{ env.APP_VERSION }}"
+          draft: false
+          prerelease: false
+          files: "ArtTreasure-v${{ env.APP_VERSION }}.apk"
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
